@@ -43,7 +43,7 @@ def generate_image(prompt: str, engine: str) -> str:
         try:
             ENGINE_USAGE[engine] += 1
             output = replicate_client.run(
-                "stability-ai/stable-diffusion:db21e45e8e9e6e8a14a7fc769d48f5d02ab9e2f403f63687e6fc1c7c2f6b6e63",
+                "stability-ai/sdxl:latest",
                 input={"prompt": prompt}
             )
             return output[0] if isinstance(output, list) and output else ""
