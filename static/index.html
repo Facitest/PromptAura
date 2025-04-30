@@ -30,25 +30,42 @@
   <script>
     const form = document.getElementById("form");
     const result = document.getElementById("result");
+    const button = form.querySelector("button");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      result.innerHTML = "Generating image...";
       const formData = new FormData(form);
-      const res = await fetch("/generate", {
-        method: "POST",
-        body: formData
-      });
-      const data = await res.json();
-      if (data.image_url) {
-        result.innerHTML = `
-          <p><strong>Success!</strong></p>
-          <img src="${data.image_url}" alt="Generated Image"/>
-          <p>Transaction ID: ${data.transaction_id}</p>
-        `;
-      } else {
-        result.innerHTML = `<p style="color: red;">${data.error}</p>`;
+      const amount = parseFloat(formData.get("amount"));
+
+      if (amount <= 0) {
+        result.innerHTML = '<p style="color: red;">Amount must be greater than 0</p>';
+        return;
       }
+
+      button.disabled = true;
+      result.innerHTML = "Generating image...";
+
+      try {
+        const res = await fetch("/generate", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.image_url) {
+          result.innerHTML = `
+            <p><strong>Success!</strong></p>
+            <img src="${data.image_url}" alt="Generated Image"/>
+            <p>Transaction ID: ${data.transaction_id}</p>
+          `;
+        } else {
+          result.innerHTML = `<p style="color: red;">${data.error}</p>`;
+        }
+      } catch (err) {
+        result.innerHTML = `<p style="color: red;">Unexpected error occurred.</p>`;
+      }
+
+      button.disabled = false;
     });
   </script>
 </body>
