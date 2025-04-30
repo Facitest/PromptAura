@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PromptAura – Bring your thoughts to life</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input, select, button { padding: 10px; margin: 10px 0; width: 100%; }
+    #result { margin-top: 20px; }
+    img { max-width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>PromptAura</h1>
+  <p>Describe your idea and pay what you want.</p>
+  <form id="form">
+    <input type="text" name="prompt" placeholder="A castle in the clouds..." required>
+    <select name="currency">
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="AUD">AUD</option>
+      <option value="NZD">NZD</option>
+    </select>
+    <input type="number" name="amount" step="0.01" placeholder="Amount (e.g. 2.50)" required>
+    <button type="submit">Generate</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById("form");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      result.innerHTML = "Generating image...";
+      const formData = new FormData(form);
+      const res = await fetch("/generate", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (data.image_url) {
+        result.innerHTML = `
+          <p><strong>Success!</strong></p>
+          <img src="${data.image_url}" alt="Generated Image"/>
+          <p>Transaction ID: ${data.transaction_id}</p>
+        `;
+      } else {
+        result.innerHTML = `<p style="color: red;">${data.error}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
